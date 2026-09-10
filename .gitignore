@@ -1,0 +1,15 @@
+# Ambientes virtuais
+venv/
+env/
+
+# Arquivos de banco de dados e dados locais
+data/
+*.duckdb
+*.db
+
+# Configurações locais sensíveis
+.env
+
+# Cache do Python
+__pycache__/
+*.pyc
