@@ -4,7 +4,7 @@ import pandas as pd
 import duckdb
 import io
 
-from app.schemas.peptide import PeptideCreate, PeptideResponse
+from app.schemas.peptide import PeptideCreate, PeptideResponse, PeptideUpdate
 from app.api.dependencies import get_database
 
 router = APIRouter(prefix="/peptides", tags=["Peptides"])
@@ -25,12 +25,10 @@ def create_peptide(peptide: PeptideCreate, db: duckdb.DuckDBPyConnection = Depen
         result = db.fetchone()
         columns = [desc[0] for desc in db.description]
         return dict(zip(columns, result))
-        
     except duckdb.ConstraintException:
         raise HTTPException(status_code=400, detail="A sequência informada já existe no banco.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/", response_model=List[PeptideResponse])
 def get_peptides(
@@ -69,6 +67,50 @@ def get_peptides(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/{id}", response_model=PeptideResponse)
+def get_peptide_by_id(id: int, db: duckdb.DuckDBPyConnection = Depends(get_database)):
+    db.execute("SELECT * FROM peptides WHERE id = ?", (id,))
+    result = db.fetchone()
+    if not result:
+        raise HTTPException(status_code=404, detail="Peptídeo não encontrado.")
+    columns = [desc[0] for desc in db.description]
+    return dict(zip(columns, result))
+
+@router.patch("/{id}", response_model=PeptideResponse)
+@router.put("/{id}", response_model=PeptideResponse)
+def update_peptide(id: int, peptide: PeptideUpdate, db: duckdb.DuckDBPyConnection = Depends(get_database)):
+    # exclude_unset=True garante que atualizaremos apenas os campos enviados no JSON
+    update_data = peptide.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Nenhum dado fornecido para atualização.")
+    
+    # Monta a query dinamicamente baseada nas chaves fornecidas
+    set_clause = ", ".join([f"{key} = ?" for key in update_data.keys()])
+    values = list(update_data.values())
+    values.append(id)
+    
+    try:
+        db.execute(f"UPDATE peptides SET {set_clause} WHERE id = ? RETURNING *", values)
+        result = db.fetchone()
+        
+        if not result:
+            raise HTTPException(status_code=404, detail="Peptídeo não encontrado.")
+            
+        columns = [desc[0] for desc in db.description]
+        return dict(zip(columns, result))
+    except duckdb.ConstraintException:
+        raise HTTPException(status_code=400, detail="Erro: A nova sequência informada já existe no banco.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/{id}")
+def delete_peptide(id: int, db: duckdb.DuckDBPyConnection = Depends(get_database)):
+    db.execute("DELETE FROM peptides WHERE id = ? RETURNING id", (id,))
+    result = db.fetchone()
+    if not result:
+        raise HTTPException(status_code=404, detail="Peptídeo não encontrado.")
+    return {"message": "Peptídeo deletado com sucesso.", "id": id}
 
 @router.post("/import", status_code=201, summary="Importar base via CSV")
 async def import_peptides_csv(file: UploadFile = File(...), db: duckdb.DuckDBPyConnection = Depends(get_database)):
@@ -84,6 +126,7 @@ async def import_peptides_csv(file: UploadFile = File(...), db: duckdb.DuckDBPyC
         if 'fonte' not in df.columns:
             df['fonte'] = None
             
+        # Omitindo o campo ID no INSERT, o DuckDB utiliza o valor DEFAULT (que é o nextval da sequence)
         db.execute("""
             INSERT INTO peptides 
             (name, sequence, organism, activity, validation, uniprot, pdb, reference, pubmed, fonte) 
@@ -91,7 +134,7 @@ async def import_peptides_csv(file: UploadFile = File(...), db: duckdb.DuckDBPyC
             FROM df
         """)
         
-        return {"message": f"Sucesso! {len(df)} registros processados."}
+        return {"message": f"Sucesso! {len(df)} registros processados. IDs gerados automaticamente."}
     except duckdb.ConstraintException:
         raise HTTPException(status_code=400, detail="Erro: O CSV contém sequências que já existem no banco (conflito UNIQUE).")
     except Exception as e:
