@@ -17,6 +17,7 @@ PERMISSIONS: dict[str, str] = {
     "peptides:update": "Editar peptídeos (PUT/PATCH)",
     "peptides:delete": "Excluir peptídeos (DELETE)",
     "peptides:import": "Importar peptídeos via CSV",
+    "coletas:run": "Ver e disparar as coletas de dados (GitHub Actions)",
     "users:read": "Ver usuários",
     "users:manage": "Criar, editar, desativar usuários e gerar links de redefinição de senha",
     "groups:read": "Ver grupos e a matriz de acesso",

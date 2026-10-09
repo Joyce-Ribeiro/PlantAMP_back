@@ -50,6 +50,17 @@ class Settings(BaseSettings):
     # Tamanho máximo do CSV de importação (MB)
     MAX_CSV_MB: int = 20
 
+    # ------------------------------------------------------------------
+    # Coletas de dados (GitHub Actions) — /api/coletas
+    # ------------------------------------------------------------------
+    # Token "fine-grained" do GitHub com acesso SÓ a este repositório e
+    # permissão "Actions: Read and write". Fica só aqui no servidor.
+    GITHUB_TOKEN: Optional[str] = None
+    # Repositório onde estão os workflows, no formato "usuario/repositorio"
+    GITHUB_REPO: Optional[str] = None
+    # Branch onde estão os arquivos .github/workflows/coleta-*.yml
+    GITHUB_REF: str = "main"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

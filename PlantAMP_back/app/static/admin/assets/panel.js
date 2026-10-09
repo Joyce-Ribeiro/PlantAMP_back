@@ -82,6 +82,88 @@
   });
 
   // ------------------------------------------------------------------
+  // Coletas de dados (GitHub Actions)
+  // ------------------------------------------------------------------
+  const COLETA_MODOS = [["novos", "Novos"], ["sincronizar", "Sincronizar"], ["csv", "Só CSV"]];
+  let coletasTimer = null;
+
+  function execucaoCell(ex) {
+    if (!ex) return h("span", { class: "status off" }, "nunca executada");
+    let label, cls;
+    if (ex.status !== "completed") { label = "em andamento"; cls = "status running"; }
+    else if (ex.conclusion === "success") { label = "concluída"; cls = "status on"; }
+    else if (ex.conclusion === "cancelled" || ex.conclusion === "skipped") { label = "cancelada"; cls = "status off"; }
+    else { label = "falhou"; cls = "status locked"; }
+    return h("div", {},
+      h("span", { class: cls }, label), " ",
+      h("span", { class: "hint" }, fmtDate(ex.criado_em), ex.evento === "schedule" ? " · agendada" : ""),
+      h("div", {}, h("a", { href: ex.url, target: "_blank", rel: "noopener" }, "ver detalhes e CSV")));
+  }
+
+  function renderColetas(data) {
+    const actions = $("#coletas-actions");
+    actions.hidden = !data.actions_url;
+    if (data.actions_url) actions.href = data.actions_url;
+
+    const head = h("thead", {}, h("tr", {},
+      h("th", {}, "Fonte"), h("th", {}, "Última execução"), h("th", {}, "Modo"), h("th", {}, "")));
+    const body = h("tbody", {}, data.fontes.map((f) => {
+      const ex = f.ultima_execucao;
+      const rodando = !!ex && ex.status !== "completed";
+      const select = h("select", { "aria-label": "Modo da coleta " + f.nome, disabled: !data.configurado },
+        COLETA_MODOS.map(([v, t]) => h("option", { value: v }, t)));
+      return h("tr", {},
+        h("td", {}, h("div", {}, h("strong", {}, f.nome)), h("div", { class: "hint" }, f.descricao)),
+        h("td", {}, f.erro ? h("span", { class: "status locked" }, f.erro) : execucaoCell(ex)),
+        h("td", {}, select),
+        h("td", {}, h("button", {
+          class: "small", type: "button", disabled: !data.configurado || rodando,
+          onclick: (ev) => dispararColeta(f, select.value, ev.currentTarget),
+        }, rodando ? "Rodando…" : "Executar")));
+    }));
+    $("#coletas").replaceChildren(head, body);
+
+    // Enquanto alguma coleta estiver rodando, atualiza o status a cada 20 s
+    clearTimeout(coletasTimer);
+    if (data.fontes.some((f) => f.ultima_execucao && f.ultima_execucao.status !== "completed")) {
+      coletasTimer = setTimeout(() => loadColetas().catch(() => {}), 20000);
+    }
+  }
+
+  async function loadColetas() {
+    const data = await api("/coletas/");
+    renderColetas(data);
+    if (!data.configurado) {
+      showMsg($("#coletas-msg"),
+        "Coletas não configuradas: defina GITHUB_TOKEN e GITHUB_REPO no .env do servidor e reinicie a API.", "warn");
+    }
+  }
+
+  async function dispararColeta(f, modo, button) {
+    const msg = $("#coletas-msg");
+    hideMsg(msg);
+    const aviso = modo === "sincronizar"
+      ? "\n\nSincronizar também ATUALIZA os peptídeos que vieram desta fonte."
+      : modo === "csv" ? "\n\nNada será gravado no banco." : "";
+    if (!confirm("Executar a coleta " + f.nome + " (modo " + modo + ")?" + aviso)) return;
+    await withBusy(button, async () => {
+      try {
+        const data = await api("/coletas/" + encodeURIComponent(f.fonte), { method: "POST", body: { modo } });
+        showMsg(msg, data.message, "ok");
+        // o GitHub leva alguns segundos para listar a execução nova
+        setTimeout(() => loadColetas().catch(() => {}), 5000);
+      } catch (e) { showMsg(msg, e.message); }
+    });
+  }
+
+  $("#coletas-refresh").addEventListener("click", async (ev) => {
+    hideMsg($("#coletas-msg"));
+    await withBusy(ev.currentTarget, async () => {
+      try { await loadColetas(); } catch (e) { showMsg($("#coletas-msg"), e.message); }
+    });
+  });
+
+  // ------------------------------------------------------------------
   // Matriz de acesso
   // ------------------------------------------------------------------
   async function loadMatrix() {
@@ -348,6 +430,10 @@
       await refreshMe();
       $("#app").hidden = false;
       await loadCodesStatus();
+      if (can("coletas:run")) {
+        $("#coletas-panel").hidden = false;
+        loadColetas().catch((e) => showMsg($("#coletas-msg"), e.message));
+      }
       if (can("groups:read")) {
         $("#matrix-panel").hidden = false;
         $("#group-form").hidden = !can("groups:manage");
