@@ -37,7 +37,7 @@ jobs:
     with:
       fonte: dbamp
       modo: ${{ inputs.modo || 'novos' }}
-      inicio: ${{ inputs.inicio || 1 }}
-      limite: ${{ inputs.limite || 0 }}
+      inicio: ${{ format('{0}', inputs.inicio || 1) }}
+      limite: ${{ format('{0}', inputs.limite || 0) }}
       timeout: 340   # a coleta completa leva ~2h30 (limite do GitHub: 6h)
     secrets: inherit

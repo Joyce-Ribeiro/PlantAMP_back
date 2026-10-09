@@ -37,7 +37,7 @@ jobs:
     with:
       fonte: apd
       modo: ${{ inputs.modo || 'novos' }}
-      inicio: ${{ inputs.inicio || 1 }}
-      limite: ${{ inputs.limite || 0 }}
+      inicio: ${{ format('{0}', inputs.inicio || 1) }}
+      limite: ${{ format('{0}', inputs.limite || 0) }}
       timeout: 30   # a coleta completa leva ~5 min
     secrets: inherit

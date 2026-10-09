@@ -12,11 +12,11 @@ on:
         type: string
         default: novos
       inicio:
-        type: number
-        default: 1
+        type: string
+        default: "1"
       limite:
-        type: number
-        default: 0
+        type: string
+        default: "0"
       timeout:
         type: number
         default: 60
@@ -29,6 +29,10 @@ jobs:
     name: Coletar ${{ inputs.fonte }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ inputs.timeout }}
+    # O código da coleta fica na subpasta PlantAMP_back/ do repositório
+    defaults:
+      run:
+        working-directory: PlantAMP_back
     steps:
       - uses: actions/checkout@v5
 
@@ -36,7 +40,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-coleta.txt
+          cache-dependency-path: PlantAMP_back/requirements-coleta.txt
 
       - name: Instalar dependências
         run: pip install -r requirements-coleta.txt
@@ -60,6 +64,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coleta-${{ inputs.fonte }}-${{ github.run_number }}
-          path: saida/
+          path: PlantAMP_back/saida/
           if-no-files-found: ignore
           retention-days: 30

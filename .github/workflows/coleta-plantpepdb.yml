@@ -37,7 +37,7 @@ jobs:
     with:
       fonte: plantpepdb
       modo: ${{ inputs.modo || 'novos' }}
-      inicio: ${{ inputs.inicio || 1 }}
-      limite: ${{ inputs.limite || 0 }}
+      inicio: ${{ format('{0}', inputs.inicio || 1) }}
+      limite: ${{ format('{0}', inputs.limite || 0) }}
       timeout: 90   # a coleta completa leva ~10 min
     secrets: inherit
