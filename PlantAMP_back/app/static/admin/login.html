@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Entrar · PlantAMP Admin</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body class="auth">
+  <main class="card">
+    <div class="brand"><span class="logo" aria-hidden="true"></span>PlantAMP <span class="tag">Admin</span></div>
+    <h1>Entrar</h1>
+    <p class="sub">Área restrita à equipe que mantém o banco. A consulta de peptídeos é pública e não precisa de login.</p>
+
+    <form id="login-form" novalidate>
+      <label>E-mail
+        <input type="email" name="email" autocomplete="username" required autofocus>
+      </label>
+      <label>Senha
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <p class="msg" id="msg" role="alert" hidden></p>
+      <button type="submit">Entrar</button>
+    </form>
+
+    <nav class="links">
+      <a href="/admin/forgot-password">Esqueci minha senha</a>
+      <a href="/admin/recovery">Tenho um código de recuperação</a>
+    </nav>
+  </main>
+  <script src="/admin/assets/common.js"></script>
+  <script src="/admin/assets/login.js"></script>
+</body>
+</html>

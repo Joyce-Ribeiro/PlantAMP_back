@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel · PlantAMP Admin</title>
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true"></span>PlantAMP <span class="tag">Admin</span></div>
+    <div class="who">
+      <span id="who-email"></span>
+      <button class="secondary small" id="logout">Sair</button>
+    </div>
+  </header>
+
+  <main class="wrap" id="app" hidden>
+    <p class="msg" id="global-msg" role="alert" hidden></p>
+
+    <!-- ===================== Minha conta ===================== -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Minha conta</h2>
+        <a href="/docs" target="_blank" rel="noopener">Abrir documentação da API</a>
+      </div>
+      <p class="sub">Grupos: <span class="chips" id="my-groups"></span></p>
+      <p class="sub">Permissões: <span class="chips" id="my-perms"></span></p>
+
+      <div class="grid-2">
+        <div>
+          <h2>Códigos de recuperação</h2>
+          <p class="sub" id="codes-status">Carregando…</p>
+          <p class="sub">Servem para recuperar a conta se você esquecer a senha e não tiver acesso ao e-mail. Gere, imprima ou guarde num gerenciador de senhas.</p>
+          <form id="codes-form" novalidate>
+            <label>Confirme sua senha atual
+              <input type="password" name="current_password" autocomplete="current-password" required>
+            </label>
+            <button type="submit">Gerar novos códigos</button>
+          </form>
+          <div id="codes-out" hidden>
+            <p class="msg warn">Estes códigos só aparecem agora. Guarde-os antes de sair desta página.</p>
+            <div class="codes" id="codes-list"></div>
+            <button class="secondary small" id="codes-copy" type="button">Copiar todos</button>
+          </div>
+        </div>
+
+        <div>
+          <h2>Trocar senha</h2>
+          <form id="pw-form" novalidate>
+            <label>Senha atual
+              <input type="password" name="current_password" autocomplete="current-password" required>
+            </label>
+            <label>Nova senha <span class="hint">mínimo 10 caracteres, com letras e números</span>
+              <input type="password" name="new_password" autocomplete="new-password" required>
+            </label>
+            <label>Repita a nova senha
+              <input type="password" name="confirm" autocomplete="new-password" required>
+            </label>
+            <p class="msg" id="pw-msg" role="alert" hidden></p>
+            <button type="submit">Salvar nova senha</button>
+          </form>
+        </div>
+      </div>
+      <p class="msg" id="codes-msg" role="alert" hidden></p>
+    </section>
+
+    <!-- ===================== Matriz de acesso ===================== -->
+    <section class="panel" id="matrix-panel" hidden>
+      <div class="panel-head">
+        <h2>Matriz de acesso</h2>
+        <div class="row">
+          <button class="secondary small" id="matrix-reset" type="button" hidden>Descartar</button>
+          <button class="small" id="matrix-save" type="button" hidden>Salvar alterações</button>
+        </div>
+      </div>
+      <p class="sub">Linhas são grupos, colunas são permissões. A leitura de peptídeos é pública e não aparece aqui. O grupo <strong>admin</strong> sempre tem tudo.</p>
+      <div class="table-wrap"><table class="matrix" id="matrix"></table></div>
+      <form id="group-form" class="row" novalidate hidden>
+        <input type="text" name="name" placeholder="novo-grupo" pattern="[a-z0-9_\-]+" required aria-label="Nome do grupo">
+        <input type="text" name="description" placeholder="Descrição (opcional)" aria-label="Descrição">
+        <button class="secondary small" type="submit">Criar grupo</button>
+      </form>
+      <p class="msg" id="matrix-msg" role="alert" hidden></p>
+    </section>
+
+    <!-- ===================== Usuários ===================== -->
+    <section class="panel" id="users-panel" hidden>
+      <div class="panel-head"><h2>Usuários</h2></div>
+      <div class="table-wrap"><table id="users"></table></div>
+      <div id="link-out" hidden>
+        <p class="sub">Link de redefinição (uso único, expira em <span id="link-exp"></span> min). <span id="link-mail"></span></p>
+        <div class="linkbox" id="link-text"></div>
+        <p><button class="secondary small" id="link-copy" type="button">Copiar link</button></p>
+      </div>
+      <p class="msg" id="users-msg" role="alert" hidden></p>
+
+      <div id="new-user" hidden>
+        <h2>Novo usuário</h2>
+        <form id="user-form" novalidate>
+          <div class="grid-2">
+            <label>E-mail <input type="email" name="email" required></label>
+            <label>Nome <input type="text" name="full_name"></label>
+          </div>
+          <label>Senha inicial <span class="hint">depois, gere um link para a pessoa criar a própria senha</span>
+            <input type="password" name="password" autocomplete="new-password" required>
+          </label>
+          <div>
+            <span class="hint">Grupos</span>
+            <div class="group-checks" id="new-user-groups"></div>
+          </div>
+          <div><button type="submit">Criar usuário</button></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="/admin/assets/common.js"></script>
+  <script src="/admin/assets/panel.js"></script>
+</body>
+</html>

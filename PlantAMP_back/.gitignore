@@ -1,0 +1,40 @@
+# ---------- Segredos (NUNCA versionar) ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Banco de dados local ----------
+# Os dados vivem no MotherDuck; arquivos locais são só para desenvolvimento.
+data/
+*.duckdb
+*.duckdb.wal
+*.db
+
+# ---------- Exportações / importações ----------
+peptideos_exportados.csv
+*.csv
+!exemplos/*.csv
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---------- Editores / sistema ----------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Logs ----------
+*.log
