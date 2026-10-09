@@ -45,7 +45,7 @@ PlantAMP_back/                      ← raiz do repositório no GitHub
    - Nome: `MOTHERDUCK_TOKEN`
    - Valor: um token do MotherDuck (*Settings → Access Tokens*). Recomendo criar um token
      só para as coletas, assim dá para revogá-lo sem derrubar a API.
-2. (Opcional) Se o banco não se chama `plantamp_db`, na aba **Variables** crie
+2. (Opcional) Se o banco não se chama `plantsamp_db`, na aba **Variables** crie
    `DATABASE_FILE` com o valor `md:nome_do_banco`.
 3. Faça commit e push dos arquivos para a branch **main**. O botão *Run workflow* só
    aparece quando o workflow já está na branch padrão.

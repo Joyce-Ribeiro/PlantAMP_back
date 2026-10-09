@@ -11,7 +11,7 @@ MODOS = ("novos", "sincronizar", "csv")
 
 def conectar() -> duckdb.DuckDBPyConnection:
     """Mesmas variáveis do .env da API: DATABASE_FILE e MOTHERDUCK_TOKEN."""
-    destino = os.environ.get("DATABASE_FILE", "md:plantamp_db")
+    destino = os.environ.get("DATABASE_FILE", "md:plantsamp_db")
     token = os.environ.get("MOTHERDUCK_TOKEN")
     if destino.startswith("md:"):
         if not token:

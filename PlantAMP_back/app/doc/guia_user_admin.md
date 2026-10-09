@@ -82,14 +82,14 @@ Campos principais:
 | Variável | O que colocar |
 |---|---|
 | `MOTHERDUCK_TOKEN` | Token da conta do MotherDuck (*Settings → Access Tokens*) |
-| `DATABASE_FILE` | `md:plantamp_db` (MotherDuck) ou `data/plantamp.duckdb` (local) |
+| `DATABASE_FILE` | `md:plantsamp_db` (MotherDuck) ou `data/plantamp.duckdb` (local) |
 | `JWT_SECRET_KEY` | Chave aleatória gerada com `python -c "import secrets; print(secrets.token_urlsafe(64))"` |
 | `ADMIN_BASE_URL` | Endereço onde a API roda, usado no link de "esqueci a senha". Local: `http://localhost:8000` |
 | `SMTP_*` | Opcional. Servidor de e-mail para enviar o link de redefinição |
 | `CORS_ORIGINS` | Domínio do site público, em JSON: `["https://plantamp.seudominio.br"]` |
 
 **Primeira vez no MotherDuck?** Crie o banco no editor SQL do site:
-`CREATE DATABASE plantamp_db;`
+`CREATE DATABASE plantsamp_db;`
 As tabelas são criadas sozinhas quando a API sobe; não existe comando de migração.
 
 > O `.env` tem segredos. Ele já está no `.gitignore`. **Nunca** envie para o GitHub.
@@ -201,12 +201,12 @@ Limite padrão: 20 MB (`MAX_CSV_MB`).
 > linha é inserida.
 
 ### Trocar de conta do MotherDuck
-1. Crie o banco na conta nova: `CREATE DATABASE plantamp_db;`
+1. Crie o banco na conta nova: `CREATE DATABASE plantsamp_db;`
 2. Coloque o token novo em `MOTHERDUCK_TOKEN` no `.env`.
 3. Suba a API (as tabelas são criadas) e crie o admin (seção 5).
 4. Exporte os dados da conta antiga (o script pede o token **antigo**):
    ```bash
-   python scripts/exportar_peptideos.py --origem md:plantamp_db
+   python scripts/exportar_peptideos.py --origem md:plantsamp_db
    ```
 5. Importe o `peptideos_exportados.csv` gerado, como explicado acima.
 
@@ -244,7 +244,7 @@ python -m app.cli list-admins                                    # lista os admi
 |---|---|
 | `pip install` falha no pandas | Python 3.14. Use 3.11–3.13. |
 | Erro de versão ao conectar no MotherDuck | O MotherDuck exige DuckDB ≥ 1.4. Rode `pip install -r requirements.txt` de novo. |
-| `Catalog Error` / banco não encontrado | Crie o banco na conta: `CREATE DATABASE plantamp_db;` |
+| `Catalog Error` / banco não encontrado | Crie o banco na conta: `CREATE DATABASE plantsamp_db;` |
 | `IO Error: Could not set lock on file` | Banco local aberto por dois programas. Pare a API antes de usar o `app.cli`. |
 | O terminal não aceita digitar a senha | Você está no console de uma IDE. Use o terminal do sistema. |
 | Todos são deslogados ao reiniciar a API | `JWT_SECRET_KEY` vazia no `.env`. |

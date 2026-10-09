@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Plantamp Backend"
     VERSION: str = "1.0.0"
-    DATABASE_FILE: str = "md:plantamp_db"
+    DATABASE_FILE: str = "md:plantsamp_db"
     MOTHERDUCK_TOKEN: Optional[str] = None
 
     # ------------------------------------------------------------------
