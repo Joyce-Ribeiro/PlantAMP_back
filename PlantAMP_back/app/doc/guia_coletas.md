@@ -16,26 +16,28 @@ pelo painel `/admin` ou pela API.
 ## 1. Onde fica cada arquivo
 
 ```
-PlantAMP_back/                      ← raiz do repositório no GitHub
+.                                   ← raiz do repositório no GitHub
 ├── .github/workflows/
 │   ├── _coleta.yml                 etapas comuns (não roda sozinho)
 │   ├── coleta-plantpepdb.yml
 │   ├── coleta-dbamp.yml
 │   └── coleta-apd.yml
-├── coleta/                         os coletores (código que era o notebook)
-│   ├── __init__.py
-│   ├── __main__.py                 comando: python -m coleta ...
-│   ├── comum.py                    limpeza, HTTP com novas tentativas, paralelismo
-│   ├── banco.py                    gravação no MotherDuck
-│   ├── plantpepdb.py
-│   ├── dbamp.py
-│   └── apd.py
-├── requirements-coleta.txt         dependências só dos coletores
-└── app/ ...                        (API: ver seção 5)
+└── PlantAMP_back/
+    ├── coleta/                     os coletores (código que era o notebook)
+    │   ├── __init__.py
+    │   ├── __main__.py             comando: python -m coleta ...
+    │   ├── comum.py                limpeza, HTTP com novas tentativas, paralelismo
+    │   ├── banco.py                gravação no MotherDuck
+    │   ├── plantpepdb.py
+    │   ├── dbamp.py
+    │   └── apd.py
+    ├── requirements-coleta.txt     dependências só dos coletores
+    └── app/ ...                    (API: ver seção 5)
 ```
 
-> A pasta `.github` precisa estar na **raiz do repositório**. Se o seu repositório
-> tiver o `PlantAMP_back` como subpasta, me avise que eu ajusto os caminhos.
+> O GitHub só lê workflows da pasta `.github/workflows/` na **raiz do repositório**.
+> Uma cópia dentro de `PlantAMP_back/` é ignorada. Como o código fica na subpasta,
+> o `_coleta.yml` roda os comandos com `working-directory: PlantAMP_back`.
 
 ---
 
