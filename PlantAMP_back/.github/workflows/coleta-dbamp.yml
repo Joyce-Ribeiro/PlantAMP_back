@@ -1,0 +1,43 @@
+name: Coleta dbAMP
+run-name: Coleta dbAMP (${{ inputs.modo || 'agendada' }})
+
+on:
+  # Disparo manual (aba Actions) ou pela API do PlantAMP (POST /api/coletas/dbamp)
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "novos = só insere sequências novas | sincronizar = também atualiza as desta fonte | csv = não grava no banco"
+        type: choice
+        options: [novos, sincronizar, csv]
+        default: novos
+      inicio:
+        description: "Primeiro id a coletar (1 = tudo)"
+        type: number
+        default: 1
+      limite:
+        description: "Coletar só N ids, para testar (0 = todos)"
+        type: number
+        default: 0
+
+  # Coleta automática mensal. Para ligar, apague o "#" das duas linhas abaixo.
+  # schedule:
+  #   - cron: "17 6 2 * *"   # dia 2 de cada mês, 03:17 em Brasília
+
+# Nunca roda duas coletas desta fonte ao mesmo tempo (um novo pedido espera o atual terminar)
+concurrency:
+  group: coleta-dbamp
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  coleta:
+    uses: ./.github/workflows/_coleta.yml
+    with:
+      fonte: dbamp
+      modo: ${{ inputs.modo || 'novos' }}
+      inicio: ${{ inputs.inicio || 1 }}
+      limite: ${{ inputs.limite || 0 }}
+      timeout: 340   # a coleta completa leva ~2h30 (limite do GitHub: 6h)
+    secrets: inherit

@@ -66,6 +66,23 @@
       <p class="msg" id="codes-msg" role="alert" hidden></p>
     </section>
 
+    <!-- ===================== Coletas de dados ===================== -->
+    <section class="panel" id="coletas-panel" hidden>
+      <div class="panel-head">
+        <h2>Coletas de dados</h2>
+        <div class="row">
+          <a id="coletas-actions" href="#" target="_blank" rel="noopener" hidden>Abrir no GitHub</a>
+          <button class="secondary small" id="coletas-refresh" type="button">Atualizar status</button>
+        </div>
+      </div>
+      <p class="sub">Cada coleta roda no GitHub Actions e grava direto no banco.
+        <strong>Novos</strong> só insere sequências que ainda não existem.
+        <strong>Sincronizar</strong> também atualiza as que vieram da mesma fonte (nunca as cadastradas à mão).
+        <strong>Só CSV</strong> não grava nada: o arquivo fica para download na execução do GitHub.</p>
+      <div class="table-wrap"><table id="coletas"></table></div>
+      <p class="msg" id="coletas-msg" role="alert" hidden></p>
+    </section>
+
     <!-- ===================== Matriz de acesso ===================== -->
     <section class="panel" id="matrix-panel" hidden>
       <div class="panel-head">

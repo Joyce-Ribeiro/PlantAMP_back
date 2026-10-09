@@ -1,0 +1,43 @@
+name: Coleta PlantPepDB
+run-name: Coleta PlantPepDB (${{ inputs.modo || 'agendada' }})
+
+on:
+  # Disparo manual (aba Actions) ou pela API do PlantAMP (POST /api/coletas/plantpepdb)
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "novos = só insere sequências novas | sincronizar = também atualiza as desta fonte | csv = não grava no banco"
+        type: choice
+        options: [novos, sincronizar, csv]
+        default: novos
+      inicio:
+        description: "Primeiro id a coletar (1 = tudo)"
+        type: number
+        default: 1
+      limite:
+        description: "Coletar só N ids, para testar (0 = todos)"
+        type: number
+        default: 0
+
+  # Coleta automática mensal. Para ligar, apague o "#" das duas linhas abaixo.
+  # schedule:
+  #   - cron: "17 6 1 * *"   # dia 1 de cada mês, 03:17 em Brasília
+
+# Nunca roda duas coletas desta fonte ao mesmo tempo (um novo pedido espera o atual terminar)
+concurrency:
+  group: coleta-plantpepdb
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  coleta:
+    uses: ./.github/workflows/_coleta.yml
+    with:
+      fonte: plantpepdb
+      modo: ${{ inputs.modo || 'novos' }}
+      inicio: ${{ inputs.inicio || 1 }}
+      limite: ${{ inputs.limite || 0 }}
+      timeout: 90   # a coleta completa leva ~10 min
+    secrets: inherit

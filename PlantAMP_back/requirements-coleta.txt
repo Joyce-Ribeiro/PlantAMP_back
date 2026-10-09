@@ -1,0 +1,5 @@
+# Dependências só dos coletores (python -m coleta). A API continua usando requirements.txt.
+requests==2.32.4
+beautifulsoup4==4.13.5
+pandas==2.2.3
+duckdb==1.4.4

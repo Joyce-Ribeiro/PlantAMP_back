@@ -1,0 +1,65 @@
+# Etapas comuns a todas as coletas. Não roda sozinho: é chamado pelos
+# workflows coleta-*.yml (um por fonte).
+name: _coleta (reutilizável)
+
+on:
+  workflow_call:
+    inputs:
+      fonte:
+        type: string
+        required: true
+      modo:
+        type: string
+        default: novos
+      inicio:
+        type: number
+        default: 1
+      limite:
+        type: number
+        default: 0
+      timeout:
+        type: number
+        default: 60
+
+permissions:
+  contents: read
+
+jobs:
+  coletar:
+    name: Coletar ${{ inputs.fonte }}
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-coleta.txt
+
+      - name: Instalar dependências
+        run: pip install -r requirements-coleta.txt
+
+      - name: Coletar e gravar no banco
+        # Os valores vão por variável de ambiente (e não direto no comando)
+        # para nenhum input conseguir injetar comandos no shell.
+        env:
+          FONTE: ${{ inputs.fonte }}
+          MODO: ${{ inputs.modo }}
+          INICIO: ${{ inputs.inicio }}
+          LIMITE: ${{ inputs.limite }}
+          MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
+          DATABASE_FILE: ${{ vars.DATABASE_FILE || 'md:plantamp_db' }}
+        run: |
+          python -m coleta --fonte "$FONTE" --modo "$MODO" \
+            --inicio "$INICIO" --limite "$LIMITE" --saida saida
+
+      - name: Guardar o CSV coletado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coleta-${{ inputs.fonte }}-${{ github.run_number }}
+          path: saida/
+          if-no-files-found: ignore
+          retention-days: 30
