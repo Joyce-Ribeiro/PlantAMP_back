@@ -54,7 +54,7 @@ jobs:
           INICIO: ${{ inputs.inicio }}
           LIMITE: ${{ inputs.limite }}
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
-          DATABASE_FILE: ${{ vars.DATABASE_FILE || 'md:plantamp_db' }}
+          DATABASE_FILE: ${{ vars.DATABASE_FILE || 'md:plantsamp_db' }}
         run: |
           python -m coleta --fonte "$FONTE" --modo "$MODO" \
             --inicio "$INICIO" --limite "$LIMITE" --saida saida
