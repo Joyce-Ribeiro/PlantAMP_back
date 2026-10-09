@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api.routers import admin_pages, auth, groups, peptides, users
+from app.api.routers import admin_pages, auth, groups, peptides, search, users
 from app.core.config import settings
 from app.db.init_db import create_tables
 
@@ -20,9 +20,9 @@ app = FastAPI(
     version=settings.VERSION,
     description=(
         "API robusta em DuckDB para a administração do banco Plantamp.\n\n"
-        "**Leitura de peptídeos é pública.** Cadastro, edição, exclusão e importação "
-        "de CSV exigem login e a permissão correspondente na matriz de acesso "
-        "(use o botão *Authorize*)."
+        "**Leitura e busca de peptídeos são públicas** (incluindo autocomplete e BLAST em `/api/search`). "
+        "Cadastro, edição, exclusão e importação de CSV exigem login e a permissão correspondente "
+        "na matriz de acesso (use o botão *Authorize*)."
     ),
     lifespan=lifespan,
 )
@@ -60,6 +60,7 @@ async def security_headers(request: Request, call_next):
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(peptides.router, prefix="/api")
+app.include_router(search.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(groups.router, prefix="/api")
 
